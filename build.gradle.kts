@@ -4,9 +4,11 @@ plugins {
     id("org.springframework.boot") version "2.7.1"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.asciidoctor.convert") version "1.5.8"
+    id ("io.freefair.lombok") version "6.5.0.3"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("plugin.jpa") version "1.6.21"
+
 }
 
 group = "com.example"
@@ -28,6 +30,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("com.ninja-squad:springmockk:3.1.1")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
@@ -40,6 +43,8 @@ tasks.withType<KotlinCompile> {
         jvmTarget = "17"
     }
 }
+
+
 
 tasks.withType<Test> {
     useJUnitPlatform()

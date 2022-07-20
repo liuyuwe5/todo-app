@@ -1,12 +1,13 @@
-package com.example.todoapp
+package com.example.todoapp.cotroller
 
-import org.junit.jupiter.api.Assertions
+import com.example.todoapp.controller.HelloController
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(HelloController::class)
 class HelloControllerTest {
@@ -16,11 +17,9 @@ class HelloControllerTest {
 
     @Test
     fun helloTest() {
-        var expectType = "application/json"
-        var acturalType = mockMvc.perform(get("/hello"))
+        mockMvc.perform(get("/hello"))
             .andExpect(status().isOk)
-            .andReturn().response.contentType
-        Assertions.assertEquals(expectType, acturalType);
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").value("Hello World"))
     }
-
 }
