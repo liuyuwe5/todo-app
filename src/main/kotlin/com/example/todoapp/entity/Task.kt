@@ -1,9 +1,10 @@
 package com.example.todoapp.entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import org.hibernate.Hibernate
 import javax.persistence.*
 
-@Entity
+@Entity(name = "Task")
 @Table(name="Task")
 data class Task (
     @Id
@@ -11,10 +12,15 @@ data class Task (
     var id: Long? = null,
 
     @Column(name="TASK_NAME", nullable=false, unique=false)
-    var name: String? = null,
+    var taskName: String? = null,
 
     @Column(name="IF_COMPLETED", nullable=false, unique=false)
-    var ifCompleted: Boolean = false
+    var ifCompleted: Boolean = false,
+
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JsonBackReference
+    @JoinColumn(name = "EXECUTOR")
+    var executor: Employee? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -28,7 +34,7 @@ data class Task (
 
     @Override
     override fun toString(): String {
-        return this::class.simpleName + "(id = $id , name = $name , ifCompleted = $ifCompleted )"
+        return this::class.simpleName + "(id = $id , taskName = $taskName , ifCompleted = $ifCompleted )"
     }
 }
 
