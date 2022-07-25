@@ -1,6 +1,5 @@
-package com.example.todoapp.cotroller
+package com.example.todoapp.controller
 
-import com.example.todoapp.controller.HelloController
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

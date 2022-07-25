@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity(name = "Employee")
 @Table(name = "Employee")
-open class Employee(
+data class Employee(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long? = null,
@@ -18,5 +18,5 @@ open class Employee(
 
     @OneToMany(mappedBy="taskName", fetch=FetchType.LAZY, cascade = [CascadeType.ALL])
     @JsonManagedReference
-    val tasksList: MutableList<Task> = mutableListOf()
+    var tasksList: MutableList<Task> = mutableListOf()
 )
