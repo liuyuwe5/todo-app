@@ -16,10 +16,11 @@ class HelloControllerTest {
     lateinit var mockMvc: MockMvc
 
     @Test
-    fun helloTest() {
+    fun shouldShowHelloWorld() {
         mockMvc.perform(get("/hello"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").value("Hello World"))
     }
+
 }

@@ -1,5 +1,8 @@
 package com.example.todoapp.controller
 
+import com.example.todoapp.entity.Employee
+import com.example.todoapp.entity.Task
+import com.example.todoapp.repository.EmployeeRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
