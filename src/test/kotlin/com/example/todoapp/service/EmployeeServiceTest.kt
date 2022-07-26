@@ -2,47 +2,61 @@ package com.example.todoapp.service
 
 import com.example.todoapp.entity.Employee
 import com.example.todoapp.entity.Task
+import com.example.todoapp.exception.EmployeeUniqueIdViolationException
 import com.example.todoapp.repository.EmployeeRepository
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.Runs
-import io.mockk.every
-import io.mockk.*
-import io.mockk.verify
 import junit.framework.TestCase.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.time.LocalDate
-import java.util.*
-import java.util.List
-
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
+import org.springframework.dao.DataIntegrityViolationException
 
 class EmployeeServiceTest {
-    private val employeeRepository= mockk<EmployeeRepository>(relaxed = true)
-    private val employeeService = EmployeeService(employeeRepository)
+
+    private val employeeRepository: EmployeeRepository = mock(EmployeeRepository::class.java)
+
+    private val employeeService: EmployeeService = EmployeeService(employeeRepository)
 
     @Test
-    fun shouldCreateEmployeeWithGeneratedId() {
-        val emily = Employee(employeeName="Emily", uniqueId = 12345)
-        every {  employeeRepository.save(emily) } returns emily
-        val actual = employeeService.createEmployee(emily)
-        verify(exactly = 1) { employeeRepository.save(emily) }
-        assertEquals(emily, actual)
+    fun `should create an employee successfully`() {
+        val expectedEmployee = Employee(employeeName = "Emily", employeeUniqueId = 12345)
+        val task1 = Task(taskName = "task1")
+        val task2 = Task(taskName = "task2")
+        expectedEmployee.tasks = mutableListOf(task1, task2)
+        task1.employee = expectedEmployee
+        task2.employee = expectedEmployee
+        `when`(employeeRepository.save(
+            Employee(employeeName = "Emily",
+                employeeUniqueId = 12345,
+                tasks = mutableListOf(task1,task2)))).thenReturn(expectedEmployee)
+
+        val actualEmployee: Employee = employeeService
+            .createEmployee("Emily", 12345, mutableListOf(task1, task2))
+
+        assertEquals(expectedEmployee.id, actualEmployee.id)
+        assertEquals(expectedEmployee.employeeName, actualEmployee.employeeName)
+        assertEquals(expectedEmployee.employeeUniqueId, actualEmployee.employeeUniqueId)
+        assertEquals(expectedEmployee.tasks, actualEmployee.tasks)
     }
 
     @Test
-    fun shouldCreateEmployeeWithTasksList() {
-        val emily = Employee(employeeName="Emily", uniqueId = 12345)
-        val task1 = Task(taskName = "Clean room", executor = emily)
-        val task2 = Task(taskName = "Buy groceries", executor = emily)
-        emily.tasksList.add(task1)
-        emily.tasksList.add(task2)
-        every {  employeeRepository.save(emily) } returns emily
-        val actual = employeeService.createEmployee(emily)
-        verify(exactly = 1) { employeeRepository.save(emily) }
-        assertEquals(emily, actual)
+    fun `should throw an exception if Employee Unique Id already exists`() {
+        val expectedException = DataIntegrityViolationException("Employee Unique Id Already Exists!")
+        val employee = Employee(employeeName = "Emily", employeeUniqueId = 12345)
+        `when`(employeeRepository
+            .save(employee))
+            .thenThrow(expectedException)
+
+        val actualException = assertThrows(EmployeeUniqueIdViolationException::class.java) {
+            employeeService.createEmployee(
+                "Emily",
+                12345,
+                mutableListOf()
+            )
+        }
+
+        assertEquals("Employee Unique Id Already Exists!", actualException.message)
     }
+
+
 }

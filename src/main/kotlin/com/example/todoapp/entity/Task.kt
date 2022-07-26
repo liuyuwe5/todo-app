@@ -1,6 +1,6 @@
 package com.example.todoapp.entity
 
-import com.fasterxml.jackson.annotation.JsonManagedReference
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import javax.persistence.*
 
 @Entity(name = "Task")
@@ -13,11 +13,11 @@ data class Task(
     @Column(name="TASK_NAME", nullable=false, unique=false)
     val taskName: String,
 
-    @Column(name="IF_COMPLETED", nullable=false, unique=false)
-    var ifCompleted: Boolean = false,
+    @Column(name="IS_COMPLETED", nullable=false, unique=false)
+    var isCompleted: Boolean = false,
 
-    @ManyToOne(fetch= FetchType.LAZY)
-    @JoinColumn(name = "EXECUTOR")
-    @JsonManagedReference
-    var executor: Employee? = null
+    @ManyToOne(fetch= FetchType.EAGER)
+    @JoinColumn(name = "EMPLOYEE_ID")
+    @JsonIgnoreProperties("tasks")
+    var employee: Employee? = null
 )
