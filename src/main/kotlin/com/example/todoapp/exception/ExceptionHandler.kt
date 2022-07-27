@@ -19,4 +19,15 @@ class ExceptionHandler {
             "Employee Unique Id Already Exists!",
         )
     }
+
+    @ExceptionHandler(value = [EmployeeNotFoundException::class])
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun handleEmployeeNotFound(
+        e: EmployeeNotFoundException
+    ): ErrorResponse {
+        return ErrorResponse(
+            "Can't Find Employee by Id!",
+        )
+    }
 }
