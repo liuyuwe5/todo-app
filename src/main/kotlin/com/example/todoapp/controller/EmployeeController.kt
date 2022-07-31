@@ -1,7 +1,6 @@
 package com.example.todoapp.controller
 
-import com.example.todoapp.controller.dto.EmployeeCreatedRequest
-import com.example.todoapp.controller.dto.EmployeeCreatedResponse
+import com.example.todoapp.controller.dto.*
 import com.example.todoapp.entity.Employee
 import com.example.todoapp.service.EmployeeService
 import org.springframework.web.bind.annotation.*
@@ -27,13 +26,28 @@ class EmployeeController(val employeeService: EmployeeService) {
     }
 
     @GetMapping("/employees/{id}", produces = ["application/json"])
-    fun getEventById(@PathVariable("id") id: Long): EmployeeCreatedResponse {
-        val employee: Employee = employeeService.getById(id)
-        return EmployeeCreatedResponse(
+    fun getEmployeeById(@PathVariable("id") id: Long): EmployeeGetResponse {
+        val employee: Employee = employeeService.getEmployeeById(id)
+        return EmployeeGetResponse(
             employee.id,
             employee.employeeName,
             employee.employeeUniqueId,
             employee.tasks
         )
+    }
+
+    @PatchMapping("/employees/{id}", produces = ["application/json"],  consumes = ["application/json"])
+    fun updateEmployeeById(@PathVariable("id") id: Long, @RequestBody employeeUpdateRequest : EmployeeUpdateRequest): EmployeeUpdateResponse {
+        employeeService.updateEmployeeById(
+            employeeUpdateRequest.employeeName,
+            employeeUpdateRequest.employeeUniqueId,
+            id)
+        return EmployeeUpdateResponse("Update Employee Successfully")
+    }
+
+    @DeleteMapping("/employees/{id}", produces = ["application/json"])
+    fun deleteEmployeeById(@PathVariable("id") id: Long): EmployeeDeleteResponse {
+        employeeService.deleteEmployeeById(id)
+        return EmployeeDeleteResponse("Delete Employee Successfully")
     }
 }

@@ -2,27 +2,26 @@ package com.example.todoapp.controller
 import com.example.todoapp.entity.Employee
 import com.example.todoapp.entity.Task
 import com.example.todoapp.exception.EmployeeNotFoundException
+import com.example.todoapp.exception.EmployeeToDeleteNotFoundException
+import com.example.todoapp.exception.EmployeeToUpdateNotFoundException
 import com.example.todoapp.service.EmployeeService
 import com.example.todoapp.exception.EmployeeUniqueIdViolationException
 import org.hamcrest.Matchers.hasSize
 import org.hamcrest.Matchers.`is`
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.validation.BindingResult
 
 @WebMvcTest(EmployeeController::class)
 class EmployeeControllerTest {
 
-    private val employeeRequestBody =
-        """{"employeeName":"Emily","employeeUniqueId":12345,"tasks":[{"taskName":"task1"},{"taskName":"task2"}]}""".trimMargin()
 
     private val employeeUniqueIdExceptionRequestBody =
         """{"employeeName":"Emily","employeeUniqueId":12345,"tasks":[]}""".trimMargin()
@@ -32,6 +31,10 @@ class EmployeeControllerTest {
 
     @MockBean
     lateinit var employeeService: EmployeeService
+
+    var result: BindingResult = mock(BindingResult::class.java)
+
+
 
     private val task1 = Task(taskName = "task1")
     private val task2 = Task(taskName = "task2")
@@ -44,6 +47,9 @@ class EmployeeControllerTest {
 
     @Test
     fun `should create employee with tasks successfully`() {
+        val employeeCreateRequest =
+            """{"employeeName":"Emily","employeeUniqueId":12345,"tasks":[{"taskName":"task1"},{"taskName":"task2"}]}""".trimMargin()
+
         `when`(
             employeeService
                 .createEmployee("Emily", 12345, mutableListOf(task1, task2))
@@ -52,7 +58,7 @@ class EmployeeControllerTest {
 
         mockMvc.perform(
             post("/employees")
-                .content(employeeRequestBody)
+                .content(employeeCreateRequest)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -82,7 +88,7 @@ class EmployeeControllerTest {
 
     @Test
     fun `should get correct employee by id if exists`() {
-        `when`(employeeService.getById(1))
+        `when`(employeeService.getEmployeeById(1))
             .thenReturn(expectedEmployee)
 
         mockMvc.perform(
@@ -99,15 +105,68 @@ class EmployeeControllerTest {
     }
 
     @Test
-    fun `should get error when can't find employee by id`() {
+    fun `should get not found when can't find employee by id`() {
         val expectedException = EmployeeNotFoundException("Can't Find Employee by Id!")
-        `when`( employeeService.getById(123)).thenThrow(expectedException)
+        `when`( employeeService.getEmployeeById(123)).thenThrow(expectedException)
 
         mockMvc.perform(
             get("/employees/123"))
             .andExpect(status().isNotFound)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.message", `is`("Can't Find Employee by Id!")))
+    }
+
+    @Test
+    fun `should update employee correctly by id if exists`() {
+        val employeeUpdateRequest =  """{"employeeName":"Emily Liu","employeeUniqueId":11010}""".trimMargin()
+
+        doNothing().`when`(employeeService).updateEmployeeById("Emily Liu", 11010,1)
+        mockMvc.perform(
+            patch("/employees/1")
+                .content(employeeUpdateRequest)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message", `is`("Update Employee Successfully")))
+
+        verify(employeeService, only()).updateEmployeeById("Emily Liu", 11010,1)
+
+   }
+    @Test
+    fun `should get not found when can't find employee to update`() {
+        val employeeUpdateRequest =
+            """{"employeeName":"Emily Liu","employeeUniqueId":11011 }""".trimMargin()
+
+        val expectedException = EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
+        `when`( employeeService.updateEmployeeById("Emily Liu", 11011, 123)).thenThrow(expectedException)
+
+        mockMvc.perform(
+            patch("/employees/123")
+                .content(employeeUpdateRequest)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message", `is`("Can't Find Employee to Update!")))
+    }
+
+    @Test
+    fun `should delete employee correctly by id if exists`() {
+        doNothing().`when`(employeeService).deleteEmployeeById(1)
+
+        mockMvc.perform(
+            delete("/employees/1"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.message", `is`("Delete Employee Successfully")))
+    }
+    @Test
+    fun `should get not found when can't find employee to delete`() {
+        val expectedException = EmployeeToDeleteNotFoundException("Can't Find Employee to Delete!")
+        `when`( employeeService.deleteEmployeeById(123)).thenThrow(expectedException)
+
+        mockMvc.perform(
+            delete("/employees/123"))
+            .andExpect(status().isNotFound)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message", `is`("Can't Find Employee to Delete!")))
     }
 
 }

@@ -9,17 +9,16 @@ data class Employee(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    val id: Long? = null,
+    var id: Long? = null,
 
     @Column(name = "EMPLOYEE_NAME", nullable = false)
-    val employeeName: String,
+    var employeeName: String,
 
     @Column(name="EMPLOYEE_UNIQUE_ID", nullable=false, unique=true)
-    val employeeUniqueId: Long,
+    var employeeUniqueId: Long,
 
     @OneToMany(mappedBy="employee", fetch=FetchType.EAGER, cascade = [CascadeType.ALL])
     @JsonIgnore
     var tasks: MutableList<Task> = mutableListOf()
 ) {
-
 }

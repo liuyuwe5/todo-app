@@ -30,4 +30,27 @@ class ExceptionHandler {
             "Can't Find Employee by Id!",
         )
     }
+
+    @ExceptionHandler(value = [EmployeeToUpdateNotFoundException::class])
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun handleEmployeeToUpdateNotFound(
+        e: EmployeeToUpdateNotFoundException
+    ): ErrorResponse {
+        return ErrorResponse(
+            "Can't Find Employee to Update!",
+        )
+    }
+
+    @ExceptionHandler(value = [EmployeeToDeleteNotFoundException::class])
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    fun handleEmployeeToDeleteNotFound(
+        e: EmployeeToDeleteNotFoundException
+    ): ErrorResponse {
+        return ErrorResponse(
+            "Can't Find Employee to Delete!",
+        )
+    }
+
 }
