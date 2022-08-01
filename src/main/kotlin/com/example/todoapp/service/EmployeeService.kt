@@ -10,6 +10,7 @@ import com.example.todoapp.repository.EmployeeRepository
 import com.example.todoapp.repository.TaskRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.logging.Logger
 
@@ -40,6 +41,7 @@ class EmployeeService(
     }
 
     fun <T : Any> Optional<T>.toNullable(): T? = this.orElse(null);
+
     fun getEmployeeById(id: Long): Employee {
         return employeeRepository.findById(id).toNullable()
             ?: throw EmployeeNotFoundException("Can't Find Employee to Get!")
@@ -49,17 +51,27 @@ class EmployeeService(
         employeeName: String,
         employeeUniqueId: Long,
         id: Long
-    ) = employeeRepository.updateEmployeeById(employeeName, employeeUniqueId, id).takeUnless {
-        it > 0
-    }?.let {
-        throw EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
+    ) {
+        try {
+            employeeRepository.updateEmployeeById(employeeName, employeeUniqueId, id).takeUnless {
+                it > 0
+            }?.let {
+                throw EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
+            }
+        } catch (e: DataIntegrityViolationException) {
+            logger.warning(
+                "Employee Unique Id to Update Already Exists: $employeeUniqueId; " +
+                        "Input Employee Name: $employeeName; Caused by: " + e.stackTraceToString()
+            )
+            throw EmployeeUniqueIdViolationException("Employee Unique Id to Update Already Exists!")
+        }
     }
 
-
+    @Transactional
     fun deleteEmployeeById(
         id: Long
     ) {
-        taskRepository.deleteTaskByEmployeeId(1)
+        taskRepository.deleteTaskByEmployeeId(id)
         employeeRepository.deleteEmployeeById(id).takeUnless {
             it > 0
         }?.let {

@@ -28,10 +28,8 @@ class EmployeeServiceTest {
         expectedEmployee.tasks = mutableListOf(task1, task2)
         task1.employee = expectedEmployee
         task2.employee = expectedEmployee
-        `when`(employeeRepository.save(
-            Employee(employeeName = "Emily",
-                employeeUniqueId = 12345,
-                tasks = mutableListOf(task1,task2)))).thenReturn(expectedEmployee)
+        `when`(employeeRepository.save(Employee(employeeName = "Emily", employeeUniqueId = 12345, tasks = mutableListOf(task1,task2))))
+            .thenReturn(expectedEmployee)
 
         val actualEmployee: Employee = employeeService
             .createEmployee("Emily", 12345, mutableListOf(task1, task2))
@@ -45,9 +43,7 @@ class EmployeeServiceTest {
     @Test
     fun `should throw an exception if Employee Unique Id already exists`() {
         val expectedException = DataIntegrityViolationException("Employee Unique Id Already Exists!")
-        `when`(employeeRepository
-            .save(expectedEmployee))
-            .thenThrow(expectedException)
+        `when`(employeeRepository.save(expectedEmployee)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeUniqueIdViolationException::class.java) {
             employeeService.createEmployee(
@@ -78,8 +74,8 @@ class EmployeeServiceTest {
     @Test
     fun `should throw an exception if employee to get not found`() {
         val expectedException = EmployeeNotFoundException("Can't Find Employee to Get!")
-        `when`(employeeRepository
-            .findById(123)).thenThrow(expectedException)
+        `when`(employeeRepository.findById(123)).thenThrow(expectedException)
+
         val actualException = assertThrows(EmployeeNotFoundException::class.java) {
             employeeService.getEmployeeById(123)
         }
@@ -90,7 +86,8 @@ class EmployeeServiceTest {
 
     @Test
     fun `should update employee by id if exists`() {
-        `when`(employeeRepository.updateEmployeeById("Emily Liu",11010, 1)).thenReturn(1)
+        `when`(employeeRepository.updateEmployeeById("Emily Liu",11010, 1))
+            .thenReturn(1)
 
         employeeService.updateEmployeeById("Emily Liu", 11010,1)
 
@@ -110,6 +107,22 @@ class EmployeeServiceTest {
     }
 
     @Test
+    fun `should throw an exception if Employee Unique Id to update already exists`() {
+        val expectedException = DataIntegrityViolationException("Employee Unique Id  to Update Already Exists!")
+        `when`(employeeRepository.updateEmployeeById("Emily", 12345, 1)).thenThrow(expectedException)
+
+        val actualException = assertThrows(EmployeeUniqueIdViolationException::class.java) {
+            employeeService.updateEmployeeById(
+                "Emily",
+                12345,
+                1
+            )
+        }
+
+        assertEquals("Employee Unique Id to Update Already Exists!", actualException.message)
+    }
+
+    @Test
     fun `should delete employee by id if exists`() {
         `when`(employeeRepository.deleteEmployeeById(1)).thenReturn(1)
 
@@ -121,8 +134,8 @@ class EmployeeServiceTest {
     @Test
     fun `should throw an exception if employee to delete not found`() {
         val expectedException = EmployeeToDeleteNotFoundException("Can't Find Employee to Delete!")
-        `when`(employeeRepository
-            .deleteEmployeeById(123)).thenThrow(expectedException)
+        `when`(employeeRepository.deleteEmployeeById(123)).thenThrow(expectedException)
+
         val actualException = assertThrows(EmployeeToDeleteNotFoundException::class.java) {
             employeeService.deleteEmployeeById(123)
         }

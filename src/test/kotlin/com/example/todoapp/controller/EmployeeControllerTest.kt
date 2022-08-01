@@ -22,7 +22,6 @@ import org.springframework.validation.BindingResult
 @WebMvcTest(EmployeeController::class)
 class EmployeeControllerTest {
 
-
     private val employeeUniqueIdExceptionRequestBody =
         """{"employeeName":"Emily","employeeUniqueId":12345,"tasks":[]}""".trimMargin()
 
@@ -31,10 +30,6 @@ class EmployeeControllerTest {
 
     @MockBean
     lateinit var employeeService: EmployeeService
-
-    var result: BindingResult = mock(BindingResult::class.java)
-
-
 
     private val task1 = Task(taskName = "task1")
     private val task2 = Task(taskName = "task2")
@@ -72,9 +67,9 @@ class EmployeeControllerTest {
     }
 
     @Test
-    fun `should get error when the employee unique id already exists with status 400`() {
+    fun `should get bad request when the employee unique id already exists`() {
         val expectedException = EmployeeUniqueIdViolationException("Employee Unique Id Already Exists!")
-        `when`( employeeService.createEmployee(employeeName = "Emily", employeeUniqueId = 12345, mutableListOf()))
+        `when`(employeeService.createEmployee(employeeName = "Emily", employeeUniqueId = 12345, mutableListOf()))
             .thenThrow(expectedException)
 
         mockMvc.perform(
@@ -107,7 +102,7 @@ class EmployeeControllerTest {
     @Test
     fun `should get not found when can't find employee by id`() {
         val expectedException = EmployeeNotFoundException("Can't Find Employee by Id!")
-        `when`( employeeService.getEmployeeById(123)).thenThrow(expectedException)
+        `when`(employeeService.getEmployeeById(123)).thenThrow(expectedException)
 
         mockMvc.perform(
             get("/employees/123"))
@@ -119,8 +114,8 @@ class EmployeeControllerTest {
     @Test
     fun `should update employee correctly by id if exists`() {
         val employeeUpdateRequest =  """{"employeeName":"Emily Liu","employeeUniqueId":11010}""".trimMargin()
-
         doNothing().`when`(employeeService).updateEmployeeById("Emily Liu", 11010,1)
+
         mockMvc.perform(
             patch("/employees/1")
                 .content(employeeUpdateRequest)
@@ -129,15 +124,14 @@ class EmployeeControllerTest {
             .andExpect(jsonPath("$.message", `is`("Update Employee Successfully")))
 
         verify(employeeService, only()).updateEmployeeById("Emily Liu", 11010,1)
-
    }
+
     @Test
     fun `should get not found when can't find employee to update`() {
         val employeeUpdateRequest =
             """{"employeeName":"Emily Liu","employeeUniqueId":11011 }""".trimMargin()
-
         val expectedException = EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
-        `when`( employeeService.updateEmployeeById("Emily Liu", 11011, 123)).thenThrow(expectedException)
+        `when`(employeeService.updateEmployeeById("Emily Liu", 11011, 123)).thenThrow(expectedException)
 
         mockMvc.perform(
             patch("/employees/123")
@@ -149,6 +143,24 @@ class EmployeeControllerTest {
     }
 
     @Test
+    fun `should get bad request when the employee unique id to update already exists`() {
+        val expectedException = EmployeeUniqueIdViolationException("Employee Unique Id to Update Already Exists!")
+        val employeeUpdateRequest =
+            """{"employeeName":"Emily Liu","employeeUniqueId":11111 }""".trimMargin()
+        `when`(employeeService.updateEmployeeById(employeeName = "Emily Liu", employeeUniqueId = 11111, 1))
+            .thenThrow(expectedException)
+
+        mockMvc.perform(
+            patch("/employees/1")
+                .content(employeeUpdateRequest)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.message", `is`("Employee Unique Id to Update Already Exists!")))
+    }
+
+    @Test
     fun `should delete employee correctly by id if exists`() {
         doNothing().`when`(employeeService).deleteEmployeeById(1)
 
@@ -156,11 +168,14 @@ class EmployeeControllerTest {
             delete("/employees/1"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.message", `is`("Delete Employee Successfully")))
+
+        verify(employeeService, only()).deleteEmployeeById(1)
     }
+
     @Test
     fun `should get not found when can't find employee to delete`() {
         val expectedException = EmployeeToDeleteNotFoundException("Can't Find Employee to Delete!")
-        `when`( employeeService.deleteEmployeeById(123)).thenThrow(expectedException)
+        `when`(employeeService.deleteEmployeeById(123)).thenThrow(expectedException)
 
         mockMvc.perform(
             delete("/employees/123"))
@@ -168,5 +183,4 @@ class EmployeeControllerTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.message", `is`("Can't Find Employee to Delete!")))
     }
-
 }

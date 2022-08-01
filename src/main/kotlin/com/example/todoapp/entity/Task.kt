@@ -43,5 +43,4 @@ data class Task(
     override fun toString(): String {
         return "Task(id=$id, taskName='$taskName', isCompleted=$isCompleted)"
     }
-
 }

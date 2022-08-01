@@ -22,21 +22,20 @@ class EmployeeController(val employeeService: EmployeeService) {
             newEmployee.employeeUniqueId,
             newEmployee.tasks
         )
-
     }
 
     @GetMapping("/employees/{id}", produces = ["application/json"])
     fun getEmployeeById(@PathVariable("id") id: Long): EmployeeGetResponse {
         val employee: Employee = employeeService.getEmployeeById(id)
         return EmployeeGetResponse(
-            employee.id,
+            employee.id!!,
             employee.employeeName,
             employee.employeeUniqueId,
             employee.tasks
         )
     }
 
-    @PatchMapping("/employees/{id}", produces = ["application/json"],  consumes = ["application/json"])
+    @PatchMapping("/employees/{id}", produces = ["application/json"])
     fun updateEmployeeById(@PathVariable("id") id: Long, @RequestBody employeeUpdateRequest : EmployeeUpdateRequest): EmployeeUpdateResponse {
         employeeService.updateEmployeeById(
             employeeUpdateRequest.employeeName,

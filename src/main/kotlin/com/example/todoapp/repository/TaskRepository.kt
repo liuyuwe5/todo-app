@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Repository
 interface TaskRepository: JpaRepository<Task,Long>{
+
     @Modifying
     @Transactional
     @Query(value = "delete from Task t where t.employee.id = ?1")

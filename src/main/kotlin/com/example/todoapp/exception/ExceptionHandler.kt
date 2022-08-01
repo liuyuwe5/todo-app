@@ -16,7 +16,7 @@ class ExceptionHandler {
         e: EmployeeUniqueIdViolationException
     ): ErrorResponse {
         return ErrorResponse(
-            "Employee Unique Id Already Exists!",
+            e.message!!
         )
     }
 
@@ -52,5 +52,4 @@ class ExceptionHandler {
             "Can't Find Employee to Delete!",
         )
     }
-
 }
