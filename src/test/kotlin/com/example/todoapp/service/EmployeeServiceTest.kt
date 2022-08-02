@@ -3,8 +3,6 @@ package com.example.todoapp.service
 import com.example.todoapp.entity.Employee
 import com.example.todoapp.entity.Task
 import com.example.todoapp.exception.EmployeeNotFoundException
-import com.example.todoapp.exception.EmployeeToDeleteNotFoundException
-import com.example.todoapp.exception.EmployeeToUpdateNotFoundException
 import com.example.todoapp.exception.EmployeeUniqueIdViolationException
 import com.example.todoapp.repository.EmployeeRepository
 import com.example.todoapp.repository.TaskRepository
@@ -41,8 +39,8 @@ class EmployeeServiceTest {
     }
 
     @Test
-    fun `should throw an exception if Employee Unique Id already exists`() {
-        val expectedException = DataIntegrityViolationException("Employee Unique Id Already Exists!")
+    fun `should throw an exception when employee unique id already exists`() {
+        val expectedException = DataIntegrityViolationException("Employee unique id already exists!")
         `when`(employeeRepository.save(expectedEmployee)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeUniqueIdViolationException::class.java) {
@@ -53,7 +51,7 @@ class EmployeeServiceTest {
             )
         }
 
-        assertEquals("Employee Unique Id Already Exists!", actualException.message)
+        assertEquals("Employee unique id already exists!", actualException.message)
     }
 
 
@@ -73,14 +71,14 @@ class EmployeeServiceTest {
 
     @Test
     fun `should throw an exception if employee to get not found`() {
-        val expectedException = EmployeeNotFoundException("Can't Find Employee to Get!")
+        val expectedException = EmployeeNotFoundException("Can't find employee to get!")
         `when`(employeeRepository.findById(123)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeNotFoundException::class.java) {
             employeeService.getEmployeeById(123)
         }
 
-        assertEquals("Can't Find Employee to Get!", actualException.message)
+        assertEquals("Can't find employee to get!", actualException.message)
     }
 
 
@@ -96,19 +94,19 @@ class EmployeeServiceTest {
 
     @Test
     fun `should throw an exception if employee to update not found`() {
-        val expectedException = EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
+        val expectedException = EmployeeNotFoundException("Can't find employee to update!")
         `when`(employeeRepository
             .updateEmployeeById("Emily Liu", 11011, 123)).thenThrow(expectedException)
-        val actualException = assertThrows(EmployeeToUpdateNotFoundException::class.java) {
+        val actualException = assertThrows(EmployeeNotFoundException::class.java) {
             employeeService.updateEmployeeById("Emily Liu", 11011, 123)
         }
 
-        assertEquals("Can't Find Employee to Update!", actualException.message)
+        assertEquals("Can't find employee to update!", actualException.message)
     }
 
     @Test
     fun `should throw an exception if Employee Unique Id to update already exists`() {
-        val expectedException = DataIntegrityViolationException("Employee Unique Id  to Update Already Exists!")
+        val expectedException = DataIntegrityViolationException("Employee unique id to update already exists!")
         `when`(employeeRepository.updateEmployeeById("Emily", 12345, 1)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeUniqueIdViolationException::class.java) {
@@ -119,7 +117,7 @@ class EmployeeServiceTest {
             )
         }
 
-        assertEquals("Employee Unique Id to Update Already Exists!", actualException.message)
+        assertEquals("Employee unique id to update already exists!", actualException.message)
     }
 
     @Test
@@ -133,14 +131,14 @@ class EmployeeServiceTest {
 
     @Test
     fun `should throw an exception if employee to delete not found`() {
-        val expectedException = EmployeeToDeleteNotFoundException("Can't Find Employee to Delete!")
+        val expectedException = EmployeeNotFoundException("Can't find employee to delete!")
         `when`(employeeRepository.deleteEmployeeById(123)).thenThrow(expectedException)
 
-        val actualException = assertThrows(EmployeeToDeleteNotFoundException::class.java) {
+        val actualException = assertThrows(EmployeeNotFoundException::class.java) {
             employeeService.deleteEmployeeById(123)
         }
 
-        assertEquals("Can't Find Employee to Delete!", actualException.message)
+        assertEquals("Can't find employee to delete!", actualException.message)
     }
 
 }

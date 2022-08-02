@@ -1,5 +1,5 @@
 package com.example.todoapp.controller.dto
 
-data class ErrorResponse(
+data class MessageResponse(
     val message: String
 )

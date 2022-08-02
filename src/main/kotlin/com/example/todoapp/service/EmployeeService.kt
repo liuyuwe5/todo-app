@@ -3,8 +3,6 @@ package com.example.todoapp.service
 import com.example.todoapp.entity.Employee
 import com.example.todoapp.entity.Task
 import com.example.todoapp.exception.EmployeeNotFoundException
-import com.example.todoapp.exception.EmployeeToDeleteNotFoundException
-import com.example.todoapp.exception.EmployeeToUpdateNotFoundException
 import com.example.todoapp.exception.EmployeeUniqueIdViolationException
 import com.example.todoapp.repository.EmployeeRepository
 import com.example.todoapp.repository.TaskRepository
@@ -26,17 +24,17 @@ class EmployeeService(
         tasks: MutableList<Task>
     ): Employee {
         val newEmployee = Employee(employeeName = employeeName, employeeUniqueId = employeeUniqueId, tasks = tasks)
-        tasks.forEach {
+        newEmployee.tasks.forEach {
             it.employee = newEmployee
         }
         try {
             return employeeRepository.save(newEmployee)
         } catch (e: DataIntegrityViolationException) {
             logger.warning(
-                "Employee Unique Id Already Exists: $employeeUniqueId; " +
-                        "Input Employee Name: $employeeName; Caused by: " + e.stackTraceToString()
+                "Employee unique id already exists: $employeeUniqueId; " +
+                        "Input employee name: $employeeName; Caused by: " + e.stackTraceToString()
             )
-            throw EmployeeUniqueIdViolationException("Employee Unique Id Already Exists!")
+            throw EmployeeUniqueIdViolationException("Employee unique id already exists!")
         }
     }
 
@@ -44,7 +42,7 @@ class EmployeeService(
 
     fun getEmployeeById(id: Long): Employee {
         return employeeRepository.findById(id).toNullable()
-            ?: throw EmployeeNotFoundException("Can't Find Employee to Get!")
+            ?: throw EmployeeNotFoundException("Can't find employee to get!")
     }
 
     fun updateEmployeeById(
@@ -56,14 +54,14 @@ class EmployeeService(
             employeeRepository.updateEmployeeById(employeeName, employeeUniqueId, id).takeUnless {
                 it > 0
             }?.let {
-                throw EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
+                throw EmployeeNotFoundException("Can't find employee to update!")
             }
         } catch (e: DataIntegrityViolationException) {
             logger.warning(
-                "Employee Unique Id to Update Already Exists: $employeeUniqueId; " +
-                        "Input Employee Name: $employeeName; Caused by: " + e.stackTraceToString()
+                "Employee unique id to update already exists: $employeeUniqueId; " +
+                        "Input employee name: $employeeName; Caused by: " + e.stackTraceToString()
             )
-            throw EmployeeUniqueIdViolationException("Employee Unique Id to Update Already Exists!")
+            throw EmployeeUniqueIdViolationException("Employee unique id to update already exists!")
         }
     }
 
@@ -75,7 +73,7 @@ class EmployeeService(
         employeeRepository.deleteEmployeeById(id).takeUnless {
             it > 0
         }?.let {
-            throw EmployeeToDeleteNotFoundException("Can't Find Employee to Delete!")
+            throw EmployeeNotFoundException("Can't find employee to delete!")
         }
     }
 }

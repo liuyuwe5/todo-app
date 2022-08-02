@@ -2,8 +2,6 @@ package com.example.todoapp.controller
 import com.example.todoapp.entity.Employee
 import com.example.todoapp.entity.Task
 import com.example.todoapp.exception.EmployeeNotFoundException
-import com.example.todoapp.exception.EmployeeToDeleteNotFoundException
-import com.example.todoapp.exception.EmployeeToUpdateNotFoundException
 import com.example.todoapp.service.EmployeeService
 import com.example.todoapp.exception.EmployeeUniqueIdViolationException
 import org.hamcrest.Matchers.hasSize
@@ -17,7 +15,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import org.springframework.validation.BindingResult
 
 @WebMvcTest(EmployeeController::class)
 class EmployeeControllerTest {
@@ -130,7 +127,7 @@ class EmployeeControllerTest {
     fun `should get not found when can't find employee to update`() {
         val employeeUpdateRequest =
             """{"employeeName":"Emily Liu","employeeUniqueId":11011 }""".trimMargin()
-        val expectedException = EmployeeToUpdateNotFoundException("Can't Find Employee to Update!")
+        val expectedException = EmployeeNotFoundException("Can't Find Employee to Update!")
         `when`(employeeService.updateEmployeeById("Emily Liu", 11011, 123)).thenThrow(expectedException)
 
         mockMvc.perform(
@@ -174,7 +171,7 @@ class EmployeeControllerTest {
 
     @Test
     fun `should get not found when can't find employee to delete`() {
-        val expectedException = EmployeeToDeleteNotFoundException("Can't Find Employee to Delete!")
+        val expectedException = EmployeeNotFoundException("Can't Find Employee to Delete!")
         `when`(employeeService.deleteEmployeeById(123)).thenThrow(expectedException)
 
         mockMvc.perform(

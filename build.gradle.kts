@@ -1,14 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20")
+    }
+}
+
 plugins {
     id("org.springframework.boot") version "2.7.1"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.asciidoctor.convert") version "1.5.8"
-    id ("io.freefair.lombok") version "6.5.0.3"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("plugin.jpa") version "1.6.21"
-
 }
 
 group = "com.example"
@@ -25,16 +29,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("com.ninja-squad:springmockk:3.1.1")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    runtimeOnly("com.h2database:h2")
+    implementation("junit:junit:4.13.2")
+    implementation("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.springframework.restdocs:spring-restdocs-webtestclient")
 }
 
 tasks.withType<KotlinCompile> {
@@ -43,8 +42,6 @@ tasks.withType<KotlinCompile> {
         jvmTarget = "17"
     }
 }
-
-
 
 tasks.withType<Test> {
     useJUnitPlatform()
@@ -57,4 +54,8 @@ tasks.test {
 tasks.asciidoctor {
     project.property("snippetsDir")?.let { inputs.dir(it) }
     dependsOn(tasks.test)
+}
+
+tasks.bootJar {
+    enabled = false
 }

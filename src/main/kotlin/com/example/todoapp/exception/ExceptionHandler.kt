@@ -1,6 +1,6 @@
 package com.example.todoapp.exception
 
-import com.example.todoapp.controller.dto.ErrorResponse
+import com.example.todoapp.controller.dto.MessageResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -14,8 +14,8 @@ class ExceptionHandler {
     @ResponseBody
     fun handleEmployeeUniqueIdExceptionViolation(
         e: EmployeeUniqueIdViolationException
-    ): ErrorResponse {
-        return ErrorResponse(
+    ): MessageResponse {
+        return  MessageResponse(
             e.message!!
         )
     }
@@ -24,32 +24,10 @@ class ExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun handleEmployeeNotFound(
-        e: EmployeeNotFoundException
-    ): ErrorResponse {
-        return ErrorResponse(
-            "Can't Find Employee by Id!",
-        )
-    }
-
-    @ExceptionHandler(value = [EmployeeToUpdateNotFoundException::class])
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    fun handleEmployeeToUpdateNotFound(
-        e: EmployeeToUpdateNotFoundException
-    ): ErrorResponse {
-        return ErrorResponse(
-            "Can't Find Employee to Update!",
-        )
-    }
-
-    @ExceptionHandler(value = [EmployeeToDeleteNotFoundException::class])
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    fun handleEmployeeToDeleteNotFound(
-        e: EmployeeToDeleteNotFoundException
-    ): ErrorResponse {
-        return ErrorResponse(
-            "Can't Find Employee to Delete!",
+        e: Exception
+    ):  MessageResponse{
+        return  MessageResponse(
+           e.message!!
         )
     }
 }
