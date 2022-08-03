@@ -39,7 +39,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+        jvmTarget = "11"
     }
 }
 
@@ -56,6 +56,6 @@ tasks.asciidoctor {
     dependsOn(tasks.test)
 }
 
-tasks.bootJar {
+tasks.getByName<Jar>("jar") {
     enabled = false
 }
