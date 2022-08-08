@@ -1,0 +1,5 @@
+FROM gradle:6.8.1-jdk11 As build
+WORKDIR /home/gradle/src
+COPY --chown=gradle:gradle . /home/gradle/src
+RUN gradle build --no-daemon
+
