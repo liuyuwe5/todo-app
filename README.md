@@ -11,6 +11,7 @@ This is a simple application where we can manipulate Employee with tasks.
 - Spring MVC
 - H2 Database
 - JPA
+- lima
 
 ## Problems 
 1. Want to use colima to deploy the jar package in a docker container:

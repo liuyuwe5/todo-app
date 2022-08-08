@@ -9,7 +9,6 @@ import com.example.todoapp.repository.TaskRepository
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 import java.util.logging.Logger
 
 @Service
@@ -38,11 +37,12 @@ class EmployeeService(
         }
     }
 
-    fun <T : Any> Optional<T>.toNullable(): T? = this.orElse(null);
-
     fun getEmployeeById(id: Long): Employee {
-        return employeeRepository.findById(id).toNullable()
-            ?: throw EmployeeNotFoundException("Can't find employee to get!")
+        if (employeeRepository.existsById(id)) {
+            return employeeRepository.findById(id).get()
+        } else {
+            throw EmployeeNotFoundException("Can't find employee to get!")
+        }
     }
 
     fun updateEmployeeById(
@@ -51,11 +51,11 @@ class EmployeeService(
         id: Long
     ) {
         try {
-            employeeRepository.updateEmployeeById(employeeName, employeeUniqueId, id).takeUnless {
-                it > 0
-            }?.let {
-                throw EmployeeNotFoundException("Can't find employee to update!")
-            }
+            if ((employeeRepository.existsById(id))) {
+                employeeRepository.updateEmployeeById(employeeName, employeeUniqueId, id)
+                } else {
+                    throw EmployeeNotFoundException("Can't find employee to update!")
+                }
         } catch (e: DataIntegrityViolationException) {
             logger.warning(
                 "Employee unique id to update already exists: $employeeUniqueId; " +
@@ -69,11 +69,10 @@ class EmployeeService(
     fun deleteEmployeeById(
         id: Long
     ) {
-        taskRepository.deleteTaskByEmployeeId(id)
-        employeeRepository.deleteEmployeeById(id).takeUnless {
-            it > 0
-        }?.let {
-            throw EmployeeNotFoundException("Can't find employee to delete!")
+        if (employeeRepository.existsById(id)) {
+            employeeRepository.deleteById(id)
+        } else {
+            throw EmployeeNotFoundException("Can't find employee to update!")
         }
     }
 }

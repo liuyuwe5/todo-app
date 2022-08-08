@@ -12,13 +12,8 @@ interface EmployeeRepository: JpaRepository<Employee, Long> {
 
     @Modifying(clearAutomatically=true)
     @Transactional
-    @Query("update Employee e set e.employeeName = ?1, " +
-            "e.employeeUniqueId = ?2 " +
-            "where e.id = ?3")
+    @Query("update Employee e set e.employeeName = :employeeName, " +
+            "e.employeeUniqueId = :employeeUniqueId " +
+            "where e.id = :id")
     fun updateEmployeeById(employeeName: String, employeeUniqueId: Long, id: Long): Int
-
-    @Modifying
-    @Transactional
-    @Query(value = "delete from Employee e where e.id = ?1")
-    fun deleteEmployeeById(id: Long): Int
 }

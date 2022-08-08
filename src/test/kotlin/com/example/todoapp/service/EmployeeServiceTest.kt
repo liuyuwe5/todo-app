@@ -59,6 +59,7 @@ class EmployeeServiceTest {
     fun `should get correct employee by id if exists`() {
         expectedEmployee.id = 1
         val expectedEmployeeOptional: Optional<Employee> = Optional.ofNullable(expectedEmployee)
+        `when`(employeeRepository.existsById(1)).thenReturn(true)
         `when`(employeeRepository.findById(1)).thenReturn(expectedEmployeeOptional)
 
         val actualEmployee = employeeService.getEmployeeById(1)
@@ -72,7 +73,7 @@ class EmployeeServiceTest {
     @Test
     fun `should throw an exception if employee to get not found`() {
         val expectedException = EmployeeNotFoundException("Can't find employee to get!")
-        `when`(employeeRepository.findById(123)).thenThrow(expectedException)
+        `when`(employeeRepository.existsById(123)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeNotFoundException::class.java) {
             employeeService.getEmployeeById(123)
@@ -84,6 +85,7 @@ class EmployeeServiceTest {
 
     @Test
     fun `should update employee by id if exists`() {
+        `when`(employeeRepository.existsById(1)).thenReturn(true)
         `when`(employeeRepository.updateEmployeeById("Emily Liu",11010, 1))
             .thenReturn(1)
 
@@ -105,8 +107,9 @@ class EmployeeServiceTest {
     }
 
     @Test
-    fun `should throw an exception if Employee Unique Id to update already exists`() {
+    fun `should throw an exception if employee unique id to update already exists`() {
         val expectedException = DataIntegrityViolationException("Employee unique id to update already exists!")
+        `when`(employeeRepository.existsById(1)).thenReturn(true)
         `when`(employeeRepository.updateEmployeeById("Emily", 12345, 1)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeUniqueIdViolationException::class.java) {
@@ -122,17 +125,18 @@ class EmployeeServiceTest {
 
     @Test
     fun `should delete employee by id if exists`() {
-        `when`(employeeRepository.deleteEmployeeById(1)).thenReturn(1)
+        `when`(employeeRepository.existsById(1)).thenReturn(true)
+        doNothing().`when`(employeeRepository).deleteById(1)
 
         employeeService.deleteEmployeeById(1)
 
-        verify(employeeRepository, times(1)).deleteEmployeeById(1)
+        verify(employeeRepository, times(1)).deleteById(1)
     }
 
     @Test
     fun `should throw an exception if employee to delete not found`() {
         val expectedException = EmployeeNotFoundException("Can't find employee to delete!")
-        `when`(employeeRepository.deleteEmployeeById(123)).thenThrow(expectedException)
+        `when`(employeeRepository.existsById(123)).thenThrow(expectedException)
 
         val actualException = assertThrows(EmployeeNotFoundException::class.java) {
             employeeService.deleteEmployeeById(123)
