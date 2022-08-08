@@ -1,10 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20")
-    }
+repositories {
+    mavenCentral()
 }
+
+//buildscript {
+//    dependencies {
+//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20")
+//    }
+//    repositories {
+//        mavenCentral()
+//    }
+//
+//}
 
 plugins {
     id("org.springframework.boot") version "2.7.1"
@@ -17,11 +25,7 @@ plugins {
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
-
-repositories {
-    mavenCentral()
-}
+java.sourceCompatibility = JavaVersion.VERSION_11
 
 extra["snippetsDir"] = file("build/generated-snippets")
 
@@ -47,15 +51,15 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.test {
-    project.property("snippetsDir")?.let { outputs.dir(it) }
-}
+//tasks.test {
+//    project.property("snippetsDir")?.let { outputs.dir(it) }
+//}
 
-tasks.asciidoctor {
-    project.property("snippetsDir")?.let { inputs.dir(it) }
-    dependsOn(tasks.test)
-}
-
-tasks.getByName<Jar>("jar") {
-    enabled = false
-}
+//tasks.asciidoctor {
+//    project.property("snippetsDir")?.let { inputs.dir(it) }
+//    dependsOn(tasks.test)
+//}
+//
+//tasks.getByName<Jar>("jar") {
+//    enabled = false
+//}

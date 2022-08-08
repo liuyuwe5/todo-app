@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  chat:
+    build:
+      dockerfile: Dockerfile_gradle
+      context: .
+    command: gradle run
+    working_dir: /home/gradle/src
+    volumes:
+      - type: bind
+        source: ./build/reports/tests/test
+        target: /home/gradle/src/build/reports/tests/test
