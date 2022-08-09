@@ -1,12 +1,20 @@
 version: '3.8'
 services:
-  chat:
-    build:
-      dockerfile: Dockerfile_gradle
-      context: .
-    command: gradle run
-    working_dir: /home/gradle/src
+  db:
+    container_name: todo-app_db_1
+    image: mysql:5.7.34
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "jade"
+      MYSQL_DATABASE: "todoapp"
+      MYSQL_USER: "jade"
+      MYSQL_PASSWORD: "jade"
+    ports:
+      - '3306:3306'
     volumes:
-      - type: bind
-        source: ./build/reports/tests/test
-        target: /home/gradle/src/build/reports/tests/test
+      - db:/home/lima.linux/.local/share/nerdctl/1935db59/volumes/default/todo-app_db
+
+volumes:
+  db:

@@ -4,3 +4,4 @@ COPY . /workdir
 RUN gradle clean build --no-daemon
 
 ENTRYPOINT ["java","-jar","/workdir/build/libs/todo-app-0.0.1-SNAPSHOT.jar"]
+

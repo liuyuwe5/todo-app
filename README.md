@@ -3,7 +3,6 @@
 ## Description
 This is a simple application where we can manipulate Employee with tasks.
 
-
 ## Dependencies
 - Gradle
 - Kolin
@@ -11,7 +10,8 @@ This is a simple application where we can manipulate Employee with tasks.
 - Spring MVC
 - H2 Database
 - JPA
-- lima
+- lima nerdctl(Docker)
+- MySQL
 
 ## Notes:
 1. Want to use colima to deploy the jar package in a docker container:
@@ -25,6 +25,13 @@ This is a simple application where we can manipulate Employee with tasks.
    * First prepare the environment: ```lima nerdctl build -f Dockerfile.cache -t todoapp-cache:v1 .```
    * Then build the jar package:  ```lima nerdctl build -f Dockerfile.build -t todoapp-build:v1 .```
    * Run the jar package: ```lima nerdctl run -it todoapp-build:v1 --entrypoint bash```
+4. Migrate the H2 database to MySQL database container in lima nerdctl:
+   * ```lima nerdctl compose up``` create container todo-app_db_1  
+   * ```lima nerdctl compose down``` stop container todo-app_db_1 
+   * ```lima nerdctl exec -it todo-app_db_1  /bin/bash``` get a bash shell in the container
+   * ```mysql -u jade -p``` log in database with user jade and password
+   * Do compose up before run the app
+
    
 
 

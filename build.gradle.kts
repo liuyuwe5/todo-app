@@ -37,6 +37,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("junit:junit:4.13.2")
     implementation("com.h2database:h2")
+    implementation("mysql:mysql-connector-java:8.0.26")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
