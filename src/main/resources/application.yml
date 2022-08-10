@@ -3,12 +3,14 @@ spring:
     database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+        ddl-auto: none
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/todoapp
     driverClassName: com.mysql.cj.jdbc.Driver
     username: jade
     password: jade
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
 
 
 #spring:

@@ -1,26 +1,19 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+
 repositories {
     mavenCentral()
 }
-
-//buildscript {
-//    dependencies {
-//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20")
-//    }
-//    repositories {
-//        mavenCentral()
-//    }
-//
-//}
 
 plugins {
     id("org.springframework.boot") version "2.7.1"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.asciidoctor.convert") version "1.5.8"
+    id("org.liquibase.gradle") version "2.0.4"
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
     kotlin("plugin.jpa") version "1.6.21"
+
 }
 
 group = "com.example"
@@ -38,6 +31,7 @@ dependencies {
     implementation("junit:junit:4.13.2")
     implementation("com.h2database:h2")
     implementation("mysql:mysql-connector-java:8.0.26")
+    implementation("org.liquibase:liquibase-core:3.8.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
@@ -48,19 +42,38 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}
+//
 //tasks.test {
 //    project.property("snippetsDir")?.let { outputs.dir(it) }
 //}
-
+//
 //tasks.asciidoctor {
 //    project.property("snippetsDir")?.let { inputs.dir(it) }
 //    dependsOn(tasks.test)
 //}
-//
-//tasks.getByName<Jar>("jar") {
-//    enabled = false
-//}
+
+tasks.getByName<Jar>("jar") {
+    enabled = false
+}
+
+tasks.update {
+    doLast {
+        liquibase {
+            activities.register("main") {
+                this.arguments = mapOf(
+                    "logLevel" to "info",
+                    "changeLogFile" to "src/main/resources/db/changelog/db.changelog-master.yaml",
+                    "url" to "jdbc:mysql://127.0.0.1:3306/todoapp",
+                    "username" to "jade",
+                    "password" to "jade",
+                    "driver" to "com.mysql.cj.jdbc.Driver"
+                )
+            }
+            runList = "main"
+        }
+    }
+}
+

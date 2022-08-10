@@ -1,0 +1,1 @@
+alter table todoapp.employee add constraint employee_unique_id unique (employee_unique_id);
